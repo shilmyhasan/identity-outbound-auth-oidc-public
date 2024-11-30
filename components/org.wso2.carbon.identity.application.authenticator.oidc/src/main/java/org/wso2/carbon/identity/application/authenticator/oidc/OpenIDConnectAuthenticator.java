@@ -18,7 +18,6 @@
 package org.wso2.carbon.identity.application.authenticator.oidc;
 
 import com.nimbusds.jose.util.JSONObjectUtils;
-import net.minidev.json.JSONArray;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -47,6 +46,7 @@ import org.wso2.carbon.identity.application.authentication.framework.util.Framew
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils;
 import org.wso2.carbon.identity.application.authenticator.oidc.internal.OpenIDConnectAuthenticatorDataHolder;
 import org.wso2.carbon.identity.application.authenticator.oidc.model.OIDCStateInfo;
+import org.wso2.carbon.identity.application.authenticator.oidc.util.OIDCConstants;
 import org.wso2.carbon.identity.application.authenticator.oidc.util.OIDCErrorConstants.ErrorMessages;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.application.common.model.Property;
@@ -68,9 +68,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -597,9 +595,12 @@ public class OpenIDConnectAuthenticator extends AbstractApplicationAuthenticator
         try {
             OAuthAuthzResponse authzResponse = OAuthAuthzResponse.oauthCodeAuthzResponse(request);
             OAuthClientRequest accessTokenRequest = getAccessTokenRequest(context, authzResponse);
-
-            // Create OAuth client that uses custom http client under the hood.
-            OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
+            OAuthClient oAuthClient;
+            if(Boolean.parseBoolean(IdentityUtil.getProperty(OIDCConstants.proxyEnable))) {
+                oAuthClient = new OAuthClient(new CustomURLConnectionClient());
+            } else {
+                oAuthClient = new OAuthClient(new URLConnectionClient());
+            }
             oAuthResponse = getOauthResponse(oAuthClient, accessTokenRequest);
             if (oAuthResponse != null) {
                 processAuthenticatedUserScopes(context, oAuthResponse.getParam(OAuthConstants.OAuth20Params.SCOPE));
