@@ -46,7 +46,6 @@ import org.wso2.carbon.identity.application.authentication.framework.util.Framew
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils;
 import org.wso2.carbon.identity.application.authenticator.oidc.internal.OpenIDConnectAuthenticatorDataHolder;
 import org.wso2.carbon.identity.application.authenticator.oidc.model.OIDCStateInfo;
-import org.wso2.carbon.identity.application.authenticator.oidc.util.OIDCConstants;
 import org.wso2.carbon.identity.application.authenticator.oidc.util.OIDCErrorConstants.ErrorMessages;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.application.common.model.Property;
@@ -596,7 +595,7 @@ public class OpenIDConnectAuthenticator extends AbstractApplicationAuthenticator
             OAuthAuthzResponse authzResponse = OAuthAuthzResponse.oauthCodeAuthzResponse(request);
             OAuthClientRequest accessTokenRequest = getAccessTokenRequest(context, authzResponse);
             OAuthClient oAuthClient;
-            if(Boolean.parseBoolean(IdentityUtil.getProperty(OIDCConstants.proxyEnable))) {
+            if(Boolean.parseBoolean(IdentityUtil.getProperty(OIDCAuthenticatorConstants.Proxy.proxyEnable))) {
                 oAuthClient = new OAuthClient(new CustomURLConnectionClient());
             } else {
                 oAuthClient = new OAuthClient(new URLConnectionClient());
